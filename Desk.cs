@@ -5,17 +5,21 @@ namespace StickClassroom
 {
     internal class Desk
     {
-        public Vector2 Position {  get; private set; }
+        public Rectangle DeskRect { get; private set; }
         private Texture2D texture;
+
+        private int deskWidth = 80;
+        private int deskHeight = 40;
+
         public Desk(int x, int y, Texture2D texture) 
         {
-            Position = new Vector2(x, y);
+            DeskRect = new Rectangle(x, y, deskWidth, deskHeight);
             this.texture = texture;
         }
 
         public void Draw(SpriteBatch spriteBatch)
         {
-            spriteBatch.Draw(texture, new Rectangle((int)Position.X, (int)Position.Y, 100, 40), Color.Brown);
+            spriteBatch.Draw(texture, DeskRect, Color.Brown);
         }
     }
 }

@@ -21,11 +21,23 @@ namespace StickClassroom
         int deskRows = 4;
         int deskCols = 6;
 
-        // Player position and speed
-        Vector2 playerPosition;
-        const float playerSpeed = 5f;
-        float dx = 0;
-        float dy = 0;
+        // Player object - abstract this out
+        Rectangle playerRect;
+        int playerSize = 40;
+        const int playerSpeed = 5;
+        int playerDX = 0;
+        int playerDY = 0;
+        bool playerCollision = false;
+        Rectangle nextPlayerPositionRect;
+
+        //int cheatBarX = Globals.WindowWidth - 50;
+        //int cheatBarY = 100;
+        //int cheatBarWidth = 35;
+        //int cheatBarHeight = Globals.WindowHeight - 160;
+        //int cheatBarFillY = cheatBarY + cheatBarHeight;
+        //int cheatBarFillHeight = 10;
+        //bool cheatBarFilling = false;
+        //int growthRateCheatBar = 1;
 
         public Game1()
         {
@@ -36,11 +48,13 @@ namespace StickClassroom
 
         protected override void Initialize()
         {
-            playerPosition = new Vector2(655, 825);
+            playerRect = new Rectangle(655, 825, playerSize, playerSize);
+            nextPlayerPositionRect = new Rectangle(655, 825, playerSize, playerSize); // might not need this
+
 
             // Set Window Size
-            graphics.PreferredBackBufferWidth = 800;  // Width of the window
-            graphics.PreferredBackBufferHeight = 900; // Height of the window
+            graphics.PreferredBackBufferWidth = Globals.WindowWidth;  
+            graphics.PreferredBackBufferHeight = Globals.WindowHeight;
             graphics.ApplyChanges(); // Apply the changes to the window size
 
             base.Initialize();
@@ -62,7 +76,7 @@ namespace StickClassroom
                 for (int j = 0; j < deskCols; j++)
                 {
                     // Calculate desk positions
-                    int x = i * 180 + 100;
+                    int x = i * 158 + 80;
                     int y = j * 120 + 170;
 
                     // Create and place a new desk at the calculated position
@@ -79,34 +93,97 @@ namespace StickClassroom
             // Get the current keyboard state
             KeyboardState state = Keyboard.GetState();
 
-            // Reset dx and dy
-            dx = 0;
-            dy = 0;
+            // Store next position deltas
+            float nextDX = 0;
+            float nextDY = 0;
 
-            // Check for movement input
+            // Movement input handling
             if (state.IsKeyDown(Keys.W))
             {
-                dy = -playerSpeed; // Move up
+                nextDY = -playerSpeed; // Move up
             }
             if (state.IsKeyDown(Keys.A))
             {
-                dx = -playerSpeed; // Move left
+                nextDX = -playerSpeed; // Move left
             }
             if (state.IsKeyDown(Keys.S))
             {
-                dy = playerSpeed; // Move down
+                nextDY = playerSpeed; // Move down
             }
             if (state.IsKeyDown(Keys.D))
             {
-                dx = playerSpeed; // Move right
+                nextDX = playerSpeed; // Move right
             }
 
+            // Handle movement in X direction first
+            bool collisionDetectedX = false;
+            Rectangle nextXPositionRect = playerRect;
+            nextXPositionRect.X += (int)nextDX;
 
-            playerPosition.X += dx;
-            playerPosition.Y += dy;
+            for (int i = 0; i < deskRows; i++)
+            {
+                for (int j = 0; j < deskCols; j++)
+                {
+                    if (nextXPositionRect.Intersects(desks[i, j].DeskRect))
+                    {
+                        collisionDetectedX = true;
+
+                        // Stop horizontal movement by snapping to edge of desk
+                        if (nextDX > 0) // Moving right
+                        {
+                            playerRect.X = desks[i, j].DeskRect.Left - playerRect.Width;
+                        }
+                        else if (nextDX < 0) // Moving left
+                        {
+                            playerRect.X = desks[i, j].DeskRect.Right;
+                        }
+                        break;
+                    }
+                }
+            }
+
+            // If no X-axis collision was detected, update player's X position
+            if (!collisionDetectedX)
+            {
+                playerRect.X += (int)nextDX;
+            }
+
+            // Handle movement in Y direction separately
+            bool collisionDetectedY = false;
+            Rectangle nextYPositionRect = playerRect;
+            nextYPositionRect.Y += (int)nextDY;
+
+            for (int i = 0; i < deskRows; i++)
+            {
+                for (int j = 0; j < deskCols; j++)
+                {
+                    if (nextYPositionRect.Intersects(desks[i, j].DeskRect))
+                    {
+                        collisionDetectedY = true;
+
+                        // Stop vertical movement by snapping to edge of desk
+                        if (nextDY > 0) // Moving down
+                        {
+                            playerRect.Y = desks[i, j].DeskRect.Top - playerRect.Height;
+                        }
+                        else if (nextDY < 0) // Moving up
+                        {
+                            playerRect.Y = desks[i, j].DeskRect.Bottom;
+                        }
+                        break;
+                    }
+                }
+            }
+
+            // If no Y-axis collision was detected, update player's Y position
+            if (!collisionDetectedY)
+            {
+                playerRect.Y += (int)nextDY;
+            }
 
             // Print the player's current position to the Debug window
-            System.Diagnostics.Debug.WriteLine($"Player Position: X = {playerPosition.X}, Y = {playerPosition.Y}");
+            System.Diagnostics.Debug.WriteLine($"Player Position: X = {playerRect.X}, Y = {playerRect.Y}");
+            System.Diagnostics.Debug.WriteLine($"Last Desk Pos: X = {desks[deskRows - 1, deskCols - 1].DeskRect.X}, Y = {desks[deskRows - 1, deskCols - 1].DeskRect.Y}");
 
             base.Update(gameTime);
         }
@@ -120,7 +197,7 @@ namespace StickClassroom
 
             Texture2D rectTexture = new Texture2D(GraphicsDevice, 1, 1);
             rectTexture.SetData(new[] { Color.White });
-            spriteBatch.Draw(rectTexture, new Rectangle((int)playerPosition.X, (int)playerPosition.Y, 40, 40), Color.Red);
+            spriteBatch.Draw(rectTexture, new Rectangle((int)playerRect.X, (int)playerRect.Y, playerSize, playerSize), Color.Red);
 
             // Draw desks
             for (int i = 0; i < deskRows; i++)
