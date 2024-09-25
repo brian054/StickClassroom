@@ -30,6 +30,9 @@ namespace StickClassroom
         bool playerCollision = false;
         Rectangle nextPlayerPositionRect;
 
+        float nextDX = 0;
+        float nextDY = 0;
+
         //int cheatBarX = Globals.WindowWidth - 50;
         //int cheatBarY = 100;
         //int cheatBarWidth = 35;
@@ -94,8 +97,8 @@ namespace StickClassroom
             KeyboardState state = Keyboard.GetState();
 
             // Store next position deltas
-            float nextDX = 0;
-            float nextDY = 0;
+            nextDX = 0;
+            nextDY = 0;
 
             // Movement input handling
             if (state.IsKeyDown(Keys.W))
