@@ -33,13 +33,14 @@ namespace StickClassroom
         float nextDX = 0;
         float nextDY = 0;
 
-        //int cheatBarX = Globals.WindowWidth - 50;
-        //int cheatBarY = 100;
+        Texture2D pixel;
+        int cheatBarX = Globals.WindowWidth - 50;
+        int cheatBarY = 100;
         //int cheatBarWidth = 35;
         //int cheatBarHeight = Globals.WindowHeight - 160;
         //int cheatBarFillY = cheatBarY + cheatBarHeight;
         //int cheatBarFillHeight = 10;
-        //bool cheatBarFilling = false;
+        float cheatBarFillPercentage = 0.0f;
         //int growthRateCheatBar = 1;
 
         public Game1()
@@ -47,6 +48,28 @@ namespace StickClassroom
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
+        }
+
+        public void DrawCheatBar(SpriteBatch spriteBatch, Rectangle outlineRect, float fillPercentage, Color outlineColor, Color fillColor)
+        {
+            // Draw the outline rectangle
+            spriteBatch.Draw(pixel, outlineRect, outlineColor);
+
+            // Calculate the height of the filling rectangle based on the percentage
+            int filledHeight = (int)((outlineRect.Height - 4) * fillPercentage); // Subtracting 4 to keep space for top and bottom outline
+
+            // Reduce the width of the filled rectangle slightly to ensure the outline is visible on the sides
+            int fillWidth = outlineRect.Width - 4; // Subtracting 4 to keep space for the outline on both sides
+
+            // Adjust the X and Y positions so the fill rect is properly inside the outline
+            int fillX = outlineRect.X + 2; // Offset X to center the fill rect
+            int fillY = outlineRect.Y + 2 + (outlineRect.Height - 4 - filledHeight); // Offset Y to account for the top outline and filling
+
+            // Create the filled rectangle inside the outline
+            Rectangle fillRect = new Rectangle(fillX, fillY, fillWidth, filledHeight);
+
+            // Draw the filling rectangle
+            spriteBatch.Draw(pixel, fillRect, fillColor);
         }
 
         protected override void Initialize()
@@ -86,6 +109,10 @@ namespace StickClassroom
                     desks[i, j] = new Desk(x, y, deskTexture);
                 }
             }
+
+            // Cheat bar stuff
+            pixel = new Texture2D(GraphicsDevice, 1, 1);
+            pixel.SetData(new[] { Color.White });
         }
 
         protected override void Update(GameTime gameTime)
@@ -116,6 +143,20 @@ namespace StickClassroom
             if (state.IsKeyDown(Keys.D))
             {
                 nextDX = playerSpeed; // Move right
+            }
+
+            // Fill the cheat bar up if needed
+            MouseState mouseState = Mouse.GetState();
+            if (mouseState.LeftButton == ButtonState.Pressed)
+            {
+                if (cheatBarFillPercentage <= 0.99f)
+                {
+                    cheatBarFillPercentage += 0.01f;
+                } 
+                else // so, the cheatBar is full meaning, the player has won the level
+                {
+                    // Level complete!
+                }
             }
 
             // Handle movement in X direction first
@@ -210,6 +251,13 @@ namespace StickClassroom
                     desks[i, j].Draw(spriteBatch);
                 }
             }
+
+            // Define the cheat bar outline and fill percentage
+            Rectangle outlineRect = new Rectangle(cheatBarX - 25, cheatBarY - 40, 40, 730);  // Position, width, height
+            //float fillPercentage = 0.75f;  // This would represent the player's progress (75% filled)
+
+            // Draw the cheat bar with outline and filling
+            DrawCheatBar(spriteBatch, outlineRect, cheatBarFillPercentage, Color.Red, Color.Green);
 
             spriteBatch.End();
 
