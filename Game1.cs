@@ -33,6 +33,9 @@ namespace StickClassroom
         float nextDX = 0;
         float nextDY = 0;
 
+        // The Nerd
+        Rectangle nerdRect;
+
         Texture2D pixel;
         int cheatBarX = Globals.WindowWidth - 50;
         int cheatBarY = 100;
@@ -41,6 +44,7 @@ namespace StickClassroom
         //int cheatBarFillY = cheatBarY + cheatBarHeight;
         //int cheatBarFillHeight = 10;
         float cheatBarFillPercentage = 0.0f;
+        bool cheatBarCanFill = false;
         //int growthRateCheatBar = 1;
 
         public Game1()
@@ -77,6 +81,7 @@ namespace StickClassroom
             playerRect = new Rectangle(655, 825, playerSize, playerSize);
             nextPlayerPositionRect = new Rectangle(655, 825, playerSize, playerSize); // might not need this
 
+            nerdRect = new Rectangle(100, 100, playerSize, playerSize); // 100, 195 ???
 
             // Set Window Size
             graphics.PreferredBackBufferWidth = Globals.WindowWidth;  
@@ -127,6 +132,8 @@ namespace StickClassroom
             nextDX = 0;
             nextDY = 0;
 
+            cheatBarCanFill = false;
+
             // Movement input handling
             if (state.IsKeyDown(Keys.W))
             {
@@ -145,25 +152,12 @@ namespace StickClassroom
                 nextDX = playerSpeed; // Move right
             }
 
-            // Fill the cheat bar up if needed
-            MouseState mouseState = Mouse.GetState();
-            if (mouseState.LeftButton == ButtonState.Pressed)
-            {
-                if (cheatBarFillPercentage <= 0.99f)
-                {
-                    cheatBarFillPercentage += 0.01f;
-                } 
-                else // so, the cheatBar is full meaning, the player has won the level
-                {
-                    // Level complete!
-                }
-            }
-
             // Handle movement in X direction first
             bool collisionDetectedX = false;
             Rectangle nextXPositionRect = playerRect;
             nextXPositionRect.X += (int)nextDX;
 
+            // Collision with desks
             for (int i = 0; i < deskRows; i++)
             {
                 for (int j = 0; j < deskCols; j++)
@@ -186,6 +180,23 @@ namespace StickClassroom
                 }
             }
 
+            // Collision with nerd 
+            if (nextXPositionRect.Intersects(nerdRect))
+            {
+                collisionDetectedX = true;
+                cheatBarCanFill = true;
+
+                // Stop horizontal movement by snapping to edge of the nerd
+                if (nextDX > 0) // Moving right
+                {
+                    playerRect.X = nerdRect.Left - playerRect.Width;
+                }
+                else if (nextDX < 0) // Moving left
+                {
+                    playerRect.X = nerdRect.Right;
+                }
+            }
+
             // If no X-axis collision was detected, update player's X position
             if (!collisionDetectedX)
             {
@@ -197,6 +208,7 @@ namespace StickClassroom
             Rectangle nextYPositionRect = playerRect;
             nextYPositionRect.Y += (int)nextDY;
 
+            // Collision with Desks
             for (int i = 0; i < deskRows; i++)
             {
                 for (int j = 0; j < deskCols; j++)
@@ -219,10 +231,41 @@ namespace StickClassroom
                 }
             }
 
+            // Collision with nerd
+            if (nextYPositionRect.Intersects(nerdRect))
+            {
+                collisionDetectedY = true;
+                cheatBarCanFill = true;
+
+                // Stop vertical movement by snapping to edge of the nerd
+                if (nextDY > 0) // Moving right
+                {
+                    playerRect.Y = nerdRect.Top - playerRect.Height;
+                }
+                else if (nextDY < 0) // Moving left
+                {
+                    playerRect.Y = nerdRect.Bottom;
+                }
+            }
+
             // If no Y-axis collision was detected, update player's Y position
             if (!collisionDetectedY)
             {
                 playerRect.Y += (int)nextDY;
+            }
+
+            // Fill the cheat bar up if needed
+            MouseState mouseState = Mouse.GetState();
+            if (mouseState.LeftButton == ButtonState.Pressed && cheatBarCanFill)
+            {
+                if (cheatBarFillPercentage <= 0.99f)
+                {
+                    cheatBarFillPercentage += 0.01f;
+                }
+                else // so, the cheatBar is full meaning, the player has won the level
+                {
+                    // Level complete!
+                }
             }
 
             // Print the player's current position to the Debug window
@@ -241,7 +284,10 @@ namespace StickClassroom
 
             Texture2D rectTexture = new Texture2D(GraphicsDevice, 1, 1);
             rectTexture.SetData(new[] { Color.White });
-            spriteBatch.Draw(rectTexture, new Rectangle((int)playerRect.X, (int)playerRect.Y, playerSize, playerSize), Color.Red);
+            // spriteBatch.Draw(rectTexture, new Rectangle((int)playerRect.X, (int)playerRect.Y, playerSize, playerSize), Color.Red);
+            spriteBatch.Draw(rectTexture, playerRect, Color.Red);
+
+            spriteBatch.Draw(rectTexture, nerdRect, Color.Blue);
 
             // Draw desks
             for (int i = 0; i < deskRows; i++)
