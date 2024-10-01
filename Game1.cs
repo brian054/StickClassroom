@@ -36,6 +36,9 @@ namespace StickClassroom
         // The Nerd
         Rectangle nerdRect;
 
+        // The Teacher
+        Rectangle teacherRect;
+
         Texture2D pixel;
         int cheatBarX = Globals.WindowWidth - 50;
         int cheatBarY = 100;
@@ -81,7 +84,13 @@ namespace StickClassroom
             playerRect = new Rectangle(655, 825, playerSize, playerSize);
             nextPlayerPositionRect = new Rectangle(655, 825, playerSize, playerSize); // might not need this
 
+            /*
+             * Lowkey playerSize might be teacher size and then 
+             * playerSize might need to be a little smaller, it depends on desks too so just experiment
+             *
+             */
             nerdRect = new Rectangle(100, 100, playerSize, playerSize); // 100, 195 ???
+            teacherRect = new Rectangle(250, 100, playerSize + 5, playerSize + 5);
 
             // Set Window Size
             graphics.PreferredBackBufferWidth = Globals.WindowWidth;  
@@ -289,6 +298,8 @@ namespace StickClassroom
 
             spriteBatch.Draw(rectTexture, nerdRect, Color.Blue);
 
+            spriteBatch.Draw(rectTexture, teacherRect, Color.Green);
+
             // Draw desks
             for (int i = 0; i < deskRows; i++)
             {
@@ -304,6 +315,7 @@ namespace StickClassroom
 
             // Draw the cheat bar with outline and filling
             DrawCheatBar(spriteBatch, outlineRect, cheatBarFillPercentage, Color.Red, Color.Green);
+
 
             spriteBatch.End();
 
