@@ -244,7 +244,7 @@ namespace StickClassroom
             // Collision with nerdCopyZone - so the player can see the nerd's test so they can now copy
             if (nextXPositionRect.Intersects(nerdCopyZone))
             {
-                cheatBarCanFill = true;
+                cheatBarCanFill = true; 
             }
 
             // If no X-axis collision was detected, update player's X position
