@@ -35,6 +35,7 @@ namespace StickClassroom
 
         // The Nerd
         Rectangle nerdRect;
+        Rectangle nerdCopyZone; 
 
         // The Teacher
         Rectangle teacherRect;
@@ -49,6 +50,11 @@ namespace StickClassroom
         float cheatBarFillPercentage = 0.0f;
         bool cheatBarCanFill = false;
         //int growthRateCheatBar = 1;
+
+        Boolean isPlayerMoving = false;
+
+        KeyboardState currentKeyboardState;
+        KeyboardState previousKeyboardState;
 
         public Game1()
         {
@@ -89,7 +95,14 @@ namespace StickClassroom
              * playerSize might need to be a little smaller, it depends on desks too so just experiment
              *
              */
-            nerdRect = new Rectangle(100, 100, playerSize, playerSize); // 100, 195 ???
+            int padding = 15;
+            nerdRect = new Rectangle(600, 825, playerSize, playerSize); // 100, 195 ???
+            nerdCopyZone = new Rectangle(
+                nerdRect.X - padding,
+                nerdRect.Y - padding,
+                nerdRect.Width + 2 * padding,
+                nerdRect.Height + 2 * padding);
+
             teacherRect = new Rectangle(250, 100, playerSize + 5, playerSize + 5);
 
             // Set Window Size
@@ -134,31 +147,53 @@ namespace StickClassroom
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // Get the current keyboard state
-            KeyboardState state = Keyboard.GetState();
-
+            // Get the current keyboard currentKeyboardState
+            previousKeyboardState = currentKeyboardState;
+            currentKeyboardState = Keyboard.GetState();
+   
             // Store next position deltas
             nextDX = 0;
             nextDY = 0;
 
             cheatBarCanFill = false;
 
+            // EWW Fix this crap
             // Movement input handling
-            if (state.IsKeyDown(Keys.W))
+            if (currentKeyboardState.IsKeyDown(Keys.W))
             {
                 nextDY = -playerSpeed; // Move up
+                isPlayerMoving = true;
+            } 
+            else if (previousKeyboardState.IsKeyDown(Keys.W) && currentKeyboardState.IsKeyUp(Keys.W)) 
+            {
+                isPlayerMoving = false;
             }
-            if (state.IsKeyDown(Keys.A))
+            if (currentKeyboardState.IsKeyDown(Keys.A))
             {
                 nextDX = -playerSpeed; // Move left
+                isPlayerMoving = true;
             }
-            if (state.IsKeyDown(Keys.S))
+            else if (previousKeyboardState.IsKeyDown(Keys.A) && currentKeyboardState.IsKeyUp(Keys.A))
+            {
+                isPlayerMoving = false;
+            }
+            if (currentKeyboardState.IsKeyDown(Keys.S))
             {
                 nextDY = playerSpeed; // Move down
+                isPlayerMoving = true;
             }
-            if (state.IsKeyDown(Keys.D))
+            else if (previousKeyboardState.IsKeyDown(Keys.S) && currentKeyboardState.IsKeyUp(Keys.S))
+            {
+                isPlayerMoving = false;
+            }
+            if (currentKeyboardState.IsKeyDown(Keys.D))
             {
                 nextDX = playerSpeed; // Move right
+                isPlayerMoving = true;
+            }
+            else if (previousKeyboardState.IsKeyDown(Keys.D) && currentKeyboardState.IsKeyUp(Keys.D))
+            {
+                isPlayerMoving = false;
             }
 
             // Handle movement in X direction first
@@ -190,10 +225,10 @@ namespace StickClassroom
             }
 
             // Collision with nerd 
-            if (nextXPositionRect.Intersects(nerdRect))
+            if (nextXPositionRect.Intersects(nerdRect))  
             {
                 collisionDetectedX = true;
-                cheatBarCanFill = true;
+               // cheatBarCanFill = true;
 
                 // Stop horizontal movement by snapping to edge of the nerd
                 if (nextDX > 0) // Moving right
@@ -204,6 +239,12 @@ namespace StickClassroom
                 {
                     playerRect.X = nerdRect.Right;
                 }
+            }
+
+            // Collision with nerdCopyZone - so the player can see the nerd's test so they can now copy
+            if (nextXPositionRect.Intersects(nerdCopyZone))
+            {
+                cheatBarCanFill = true;
             }
 
             // If no X-axis collision was detected, update player's X position
@@ -244,7 +285,7 @@ namespace StickClassroom
             if (nextYPositionRect.Intersects(nerdRect))
             {
                 collisionDetectedY = true;
-                cheatBarCanFill = true;
+                //cheatBarCanFill = true;
 
                 // Stop vertical movement by snapping to edge of the nerd
                 if (nextDY > 0) // Moving right
@@ -255,6 +296,12 @@ namespace StickClassroom
                 {
                     playerRect.Y = nerdRect.Bottom;
                 }
+            }
+
+            // Collision with nerdCopyZone - so the player can see the nerd's test so they can now copy
+            if (nextYPositionRect.Intersects(nerdCopyZone))
+            {
+                cheatBarCanFill = true;
             }
 
             // If no Y-axis collision was detected, update player's Y position
@@ -296,6 +343,7 @@ namespace StickClassroom
             // spriteBatch.Draw(rectTexture, new Rectangle((int)playerRect.X, (int)playerRect.Y, playerSize, playerSize), Color.Red);
             spriteBatch.Draw(rectTexture, playerRect, Color.Red);
 
+           // spriteBatch.Draw(rectTexture, nerdCopyZone, Color.Yellow); // Eventually this will be invisible of course
             spriteBatch.Draw(rectTexture, nerdRect, Color.Blue);
 
             spriteBatch.Draw(rectTexture, teacherRect, Color.Green);
