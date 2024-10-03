@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Microsoft.Xna.Framework.Graphics;
+using Microsoft.Xna.Framework;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -11,6 +13,6 @@ namespace StickClassroom
         public static int WindowWidth { get; set; } = 800;
         public static int WindowHeight { get; set; } = 900;
 
-        public static int studentSize { get; set; } = 40;
+        public static int StudentSize { get; set; } = 40;
     }
 }
