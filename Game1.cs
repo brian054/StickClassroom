@@ -23,7 +23,6 @@ namespace StickClassroom
 
         // Player object - abstract this out
         Rectangle playerRect;
-        int playerSize = 40;
         const int playerSpeed = 5;
         int playerDX = 0;
         int playerDY = 0;
@@ -87,23 +86,23 @@ namespace StickClassroom
 
         protected override void Initialize()
         {
-            playerRect = new Rectangle(655, 825, playerSize, playerSize);
-            nextPlayerPositionRect = new Rectangle(655, 825, playerSize, playerSize); // might not need this
+            playerRect = new Rectangle(655, 825, Globals.studentSize, Globals.studentSize);
+            nextPlayerPositionRect = new Rectangle(655, 825, Globals.studentSize, Globals.studentSize); // might not need this
 
             /*
-             * Lowkey playerSize might be teacher size and then 
-             * playerSize might need to be a little smaller, it depends on desks too so just experiment
+             * Lowkey Globals.studentSize might be teacher size and then 
+             * Globals.studentSize might need to be a little smaller, it depends on desks too so just experiment
              *
              */
-            int padding = 15;
-            nerdRect = new Rectangle(600, 825, playerSize, playerSize); // 100, 195 ???
-            nerdCopyZone = new Rectangle(
-                nerdRect.X - padding,
-                nerdRect.Y - padding,
-                nerdRect.Width + 2 * padding,
-                nerdRect.Height + 2 * padding);
+            //int padding = 15;
+            //nerdRect = new Rectangle(600, 825, Globals.studentSize, Globals.studentSize); // 100, 195 ???
+            //nerdCopyZone = new Rectangle(
+            //    nerdRect.X - padding,
+            //    nerdRect.Y - padding,
+            //    nerdRect.Width + 2 * padding,
+            //    nerdRect.Height + 2 * padding);
 
-            teacherRect = new Rectangle(250, 100, playerSize + 5, playerSize + 5);
+            teacherRect = new Rectangle(250, 100, Globals.studentSize + 5, Globals.studentSize + 5);
 
             // Set Window Size
             graphics.PreferredBackBufferWidth = Globals.WindowWidth;  
@@ -340,7 +339,7 @@ namespace StickClassroom
 
             Texture2D rectTexture = new Texture2D(GraphicsDevice, 1, 1);
             rectTexture.SetData(new[] { Color.White });
-            // spriteBatch.Draw(rectTexture, new Rectangle((int)playerRect.X, (int)playerRect.Y, playerSize, playerSize), Color.Red);
+            // spriteBatch.Draw(rectTexture, new Rectangle((int)playerRect.X, (int)playerRect.Y, Globals.studentSize, Globals.studentSize), Color.Red);
             spriteBatch.Draw(rectTexture, playerRect, Color.Red);
 
            // spriteBatch.Draw(rectTexture, nerdCopyZone, Color.Yellow); // Eventually this will be invisible of course

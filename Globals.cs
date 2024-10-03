@@ -10,5 +10,7 @@ namespace StickClassroom
     {
         public static int WindowWidth { get; set; } = 800;
         public static int WindowHeight { get; set; } = 900;
+
+        public static int studentSize { get; set; } = 40;
     }
 }
