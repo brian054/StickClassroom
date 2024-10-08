@@ -12,24 +12,17 @@ namespace StickClassroom
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
 
-        Texture2D rectTexture;
+        CollisionManager CollisionManager;
 
+        Texture2D rectTexture; // private or nah, yee prolly
         Desk[,] desks;
-
-        // Desk grid size
         int deskRows;
         int deskCols; 
 
-        // The Nerd
         TheNerd nerd;
-
         CheatBar cheatBar;
-
         Player player;
-
-        // The Teacher
         Rectangle teacherRect;
-
         KeyboardState currentKeyboardState;
 
         public Game1()
@@ -56,6 +49,8 @@ namespace StickClassroom
 
             // Cheat Bar
             cheatBar = new(rectTexture);
+
+            CollisionManager = new();
 
             // Set Window Size
             graphics.PreferredBackBufferWidth = Globals.WindowWidth;  
@@ -91,119 +86,28 @@ namespace StickClassroom
 
             currentKeyboardState = Keyboard.GetState();
 
-            // Handle movement in X direction first
-            bool collisionDetectedX = false;
-            Rectangle nextXPositionRect = player.playerRect;
-            nextXPositionRect.X += (int)player.nextDX;
+            // collisionManager object here, then pass this into player.Update() ???
 
-            player.Update(currentKeyboardState);
+            player.Update(currentKeyboardState, desks, nerd);
 
-            // Collision with desks
-            for (int i = 0; i < deskRows; i++)
-            {
-                for (int j = 0; j < deskCols; j++)
-                {
-                    if (nextXPositionRect.Intersects(desks[i, j].DeskRect))
-                    {
-                        collisionDetectedX = true;
+            //bool collisionOccurred = CollisionManager.HandlePlayerCollision(player, desks, nerd, deskRows, deskCols);
 
-                        // Stop horizontal movement by snapping to edge of desk
-                        if (player.nextDX > 0) // Moving right
-                        {
-                            player.playerRect = new Rectangle(desks[i, j].DeskRect.Left - player.playerRect.Width, player.Position.Y, Globals.StudentSize, Globals.StudentSize);
-                        }
-                        else if (player.nextDX < 0) // Moving left
-                        {
-                            player.playerRect = new Rectangle(desks[i, j].DeskRect.Right, player.Position.Y, Globals.StudentSize, Globals.StudentSize);
-                        }
-                        break;
-                    }
-                }
-            }
-
-            // Collision with nerd 
-            if (nextXPositionRect.Intersects(nerd.NerdRect))  
-            {
-                collisionDetectedX = true;
-
-                // Stop horizontal movement by snapping to edge of the nerd
-                //if (player.nextDX > 0) // Moving right
-                //{
-                //    player.playerRect.X = nerd.NerdRect.Left - player.playerRect.Width;
-                //}
-                //else if (player.nextDX < 0) // Moving left
-                //{
-                //    player.playerRect.X = nerd.NerdRect.Right;
-                //}
-            }
-
-            // If no X-axis collision was detected, update player's X position
-            if (!collisionDetectedX)
-            {
-                //player.playerRect += (int)player.nextDX;
-                player.Position = new Point(player.Position.X + (int)player.nextDX, player.Position.Y);
-            }
-
-            // Handle movement in Y direction separately
-            bool collisionDetectedY = false;
-            Rectangle nextYPositionRect = player.playerRect;
-            nextYPositionRect.Y += (int)player.nextDY;
-
-            // Collision with Desks
-            for (int i = 0; i < deskRows; i++)
-            {
-                for (int j = 0; j < deskCols; j++)
-                {
-                    //if (nextYPositionRect.Intersects(desks[i, j].DeskRect))
-                    //{
-                    //    collisionDetectedY = true;
-
-                    //    // Stop vertical movement by snapping to edge of desk
-                    //    if (player.nextDY > 0) // Moving down
-                    //    {
-                    //        player.playerRect.Y = desks[i, j].DeskRect.Top - player.playerRect.Height;
-                    //    }
-                    //    else if (player.nextDY < 0) // Moving up
-                    //    {
-                    //        player.playerRect.Y = desks[i, j].DeskRect.Bottom;
-                    //    }
-                    //    break;
-                    //}
-                }
-            }
-
-            // Collision with nerd
-            //if (nextYPositionRect.Intersects(nerd.NerdRect))
+            //// Handle Player-Desk collision
+            //if (!(collisionOccurred))
             //{
-            //    collisionDetectedY = true;
-
-            //    // Stop vertical movement by snapping to edge of the nerd
-            //    if (player.nextDY > 0) // Moving right
-            //    {
-            //        player.playerRect.Y = nerd.NerdRect.Top - player.playerRect.Height;
-            //    }
-            //    else if (player.nextDY < 0) // Moving left
-            //    {
-            //        player.playerRect.Y = nerd.NerdRect.Bottom;
-            //    }
+            //    player.Position = new Point(player.Position.X + (int)player.nextDX, player.Position.Y + (int)player.nextDY);
             //}
 
-            // Collision with nerd.nerdCopyZone - so the player can see the nerd's test so they can now copy
-            if (nextXPositionRect.Intersects(nerd.NerdCopyZone) || nextYPositionRect.Intersects(nerd.NerdCopyZone))
-            {
-                this.cheatBar.cheatBarCanFill = true;
-            }
+            //// Handle collision with nerd's copy zone
+            //if (CollisionManager.CheckCollision(player.playerRect, nerd.NerdCopyZone))
+            //{
+            //    cheatBar.cheatBarCanFill = true;
+            //}
+
             MouseState mouseState = Mouse.GetState();
-            this.cheatBar.Update(mouseState);
+            cheatBar.Update(mouseState);
 
-            this.cheatBar.cheatBarCanFill = false;
-
-            // If no Y-axis collision was detected, update player's Y position
-            if (!collisionDetectedY)
-            {
-                //player.playerRect.Y += (int)player.nextDY;
-                player.Position = new Point(player.Position.X + (int)player.nextDX, player.Position.Y + (int)player.nextDY);
-            }
+            cheatBar.cheatBarCanFill = false;
 
             //System.Diagnostics.Debug.WriteLine($"Player Position: X = {player.playerRect.X}, Y = {player.playerRect.Y}");
 
@@ -215,10 +119,8 @@ namespace StickClassroom
             GraphicsDevice.Clear(Color.CornflowerBlue);
 
             spriteBatch.Begin();
-
-            this.player.Draw(spriteBatch);
-
-            this.nerd.Draw(spriteBatch);
+            player.Draw(spriteBatch);
+            nerd.Draw(spriteBatch);
 
             // Draw desks
             for (int i = 0; i < deskRows; i++)
@@ -229,8 +131,7 @@ namespace StickClassroom
                 }
             }
 
-            this.cheatBar.Draw(spriteBatch);
-
+            cheatBar.Draw(spriteBatch);
             spriteBatch.End();
 
             base.Draw(gameTime);

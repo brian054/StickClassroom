@@ -12,7 +12,7 @@ namespace StickClassroom
 {
     internal class Player
     {
-        private const int playerSpeed = 2; // possibly could be a boost or something
+        private const int playerSpeed = 5; // possibly could be a boost or something
         public Point Position { get; set; }
 
         public Rectangle playerRect
@@ -30,38 +30,55 @@ namespace StickClassroom
         public float nextDX;
         public float nextDY;
 
+        // Store the current movement direction
+        public Direction MovementDirection { get; private set; } = Direction.None;
+
         public Player(int x, int y, Texture2D texture) 
         {
             this.texture = texture;
             this.Position = new Point(x, y);
         }
 
-        public void Update(KeyboardState kb)
+        public void Update(KeyboardState kb, Desk[,] desks, TheNerd nerd)
         {
             // Store next position deltas
             nextDX = 0;
-            nextDY = 0;
-
-            // Movement input handling
-            if (kb.IsKeyDown(Keys.W))
-            {
-                nextDY = -playerSpeed; // Move up
-            }
             if (kb.IsKeyDown(Keys.A))
             {
                 nextDX = -playerSpeed; // Move left
-            }
-            if (kb.IsKeyDown(Keys.S))
-            {
-                nextDY = playerSpeed; // Move down
             }
             if (kb.IsKeyDown(Keys.D))
             {
                 nextDX = playerSpeed; // Move right
             }
+            Position = new Point(Position.X + (int)nextDX, Position.Y);
+
+            // pass in this to collision manager (so literally this will check desks and the nerd) 
+            // for now just passing in the objects
+            if (playerRect.Intersects(nerd.NerdRect))
+            {
+                Position = new Point(Position.X - (int)nextDX, Position.Y);
+            }
+
+            nextDY = 0;
+            if (kb.IsKeyDown(Keys.W))
+            {
+                nextDY = -playerSpeed; // Move up
+            }
+            if (kb.IsKeyDown(Keys.S))
+            {
+                nextDY = playerSpeed; // Move down
+            }
+            Position = new Point(Position.X, Position.Y + (int)nextDY);
+
+            // pass in same thing
 
             // Update the player's position using the deltas
-            Position = new Point(Position.X + (int)nextDX, Position.Y + (int)nextDY);
+            //Position = new Point(Position.X + (int)nextDX, Position.Y + (int)nextDY);
+            if (playerRect.Intersects(nerd.NerdRect))
+            {
+                Position = new Point(Position.X, Position.Y - (int)nextDY);
+            }
         }
 
         public void Draw(SpriteBatch spriteBatch)
