@@ -12,7 +12,7 @@ namespace StickClassroom
 {
     internal class Player
     {
-        private const int playerSpeed = 5; // possibly could be a boost or something
+        public int playerSpeed { get; set; } // possibly could be a boost or something
         public Point Position { get; set; }
 
         public Rectangle playerRect
@@ -27,19 +27,22 @@ namespace StickClassroom
         private Texture2D texture;
 
         // temp
-        public float nextDX;
-        public float nextDY;
+        public int nextDX;
+        public int nextDY;
 
-        // Store the current movement direction
-        public Direction MovementDirection { get; private set; } = Direction.None;
+        //CollisionManager collisionManager;
 
         public Player(int x, int y, Texture2D texture) 
         {
             this.texture = texture;
             this.Position = new Point(x, y);
+
+            playerSpeed = 5;
+
+            //collisionManager = new CollisionManager(); 
         }
 
-        public void Update(KeyboardState kb, Desk[,] desks, TheNerd nerd)
+        public void Update(KeyboardState kb, CollisionManager cm)
         {
             // Store next position deltas
             nextDX = 0;
@@ -51,13 +54,19 @@ namespace StickClassroom
             {
                 nextDX = playerSpeed; // Move right
             }
-            Position = new Point(Position.X + (int)nextDX, Position.Y);
+            Position = new Point(Position.X + nextDX, Position.Y);
 
-            // pass in this to collision manager (so literally this will check desks and the nerd) 
-            // for now just passing in the objects
-            if (playerRect.Intersects(nerd.NerdRect))
+            // Collision X
+            if (!(cm.GetCollidingRectangle(playerRect).IsEmpty))
             {
-                Position = new Point(Position.X - (int)nextDX, Position.Y);
+                // Get the rectangle we are colliding with
+                Rectangle collidingRect = cm.GetCollidingRectangle(playerRect);
+
+                // Snap the player to the closest edge of the colliding rectangle
+                if (nextDX > 0) // Moving right
+                    Position = new Point(collidingRect.Left - playerRect.Width, Position.Y);
+                else if (nextDX < 0) // Moving left
+                    Position = new Point(collidingRect.Right, Position.Y);
             }
 
             nextDY = 0;
@@ -69,15 +78,18 @@ namespace StickClassroom
             {
                 nextDY = playerSpeed; // Move down
             }
-            Position = new Point(Position.X, Position.Y + (int)nextDY);
+            Position = new Point(Position.X, Position.Y + nextDY);
 
-            // pass in same thing
-
-            // Update the player's position using the deltas
-            //Position = new Point(Position.X + (int)nextDX, Position.Y + (int)nextDY);
-            if (playerRect.Intersects(nerd.NerdRect))
+            // Collision Y
+            if (!(cm.GetCollidingRectangle(playerRect).IsEmpty))
             {
-                Position = new Point(Position.X, Position.Y - (int)nextDY);
+                Rectangle collidingRect = cm.GetCollidingRectangle(playerRect);
+
+                // Snap the player to the closest edge of the colliding rectangle
+                if (nextDY > 0) // Moving down
+                    Position = new Point(Position.X, collidingRect.Top - playerRect.Height);
+                else if (nextDY < 0) // Moving up
+                    Position = new Point(Position.X, collidingRect.Bottom);
             }
         }
 

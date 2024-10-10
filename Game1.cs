@@ -2,8 +2,7 @@
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System;
-
-// test commit
+using System.Collections.Generic;
 
 namespace StickClassroom
 {
@@ -22,11 +21,16 @@ namespace StickClassroom
         TheNerd nerd;
         CheatBar cheatBar;
         Player player;
-        Rectangle teacherRect;
+        Teacher teacher;
         KeyboardState currentKeyboardState;
+
+        List<Rectangle> collidables = new List<Rectangle>();
 
         public Game1()
         {
+            IsFixedTimeStep = true; // so Update() will be called 60 times per second
+            TargetElapsedTime = TimeSpan.FromMilliseconds(16.67); // 60 FPS
+
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
             IsMouseVisible = true;
@@ -45,24 +49,13 @@ namespace StickClassroom
             //player.playerRect = new Rectangle(655, 825, Globals.StudentSize, Globals.StudentSize);
             player = new(655, 825, rectTexture);
             nerd = new(600, 825, rectTexture);
-            teacherRect = new Rectangle(250, 100, Globals.StudentSize + 5, Globals.StudentSize + 5);
+            teacher = new(250, 100, rectTexture);
 
-            // Cheat Bar
             cheatBar = new(rectTexture);
 
-            CollisionManager = new();
+            collidables.Add(nerd.NerdRect);
+           // collidables.Add(teacher.teacherRect); collidables only for non-moving objects for now
 
-            // Set Window Size
-            graphics.PreferredBackBufferWidth = Globals.WindowWidth;  
-            graphics.PreferredBackBufferHeight = Globals.WindowHeight;
-            graphics.ApplyChanges(); // Apply the changes to the window size
-
-            base.Initialize();
-        }
-
-        protected override void LoadContent()
-        {
-            spriteBatch = new SpriteBatch(GraphicsDevice);
 
             desks = new Desk[deskRows, deskCols];
             for (int i = 0; i < deskRows; i++)
@@ -75,8 +68,25 @@ namespace StickClassroom
 
                     // Create and place a new desk at the calculated position
                     desks[i, j] = new Desk(x, y, rectTexture);
+
+                    // Store in collidables List
+                    collidables.Add(desks[i, j].DeskRect);
                 }
             }
+
+            CollisionManager = new(collidables.ToArray());
+
+            // Set Window Size
+            graphics.PreferredBackBufferWidth = Globals.WindowWidth;  
+            graphics.PreferredBackBufferHeight = Globals.WindowHeight;
+            graphics.ApplyChanges(); // Apply the changes to the window size
+
+            base.Initialize();
+        }
+
+        protected override void LoadContent()
+        {
+            spriteBatch = new SpriteBatch(GraphicsDevice);
         }
 
         protected override void Update(GameTime gameTime)
@@ -86,23 +96,30 @@ namespace StickClassroom
 
             currentKeyboardState = Keyboard.GetState();
 
-            // collisionManager object here, then pass this into player.Update() ???
+            player.Update(currentKeyboardState, CollisionManager);
+            teacher.Update();
 
-            player.Update(currentKeyboardState, desks, nerd);
+            // temp behavior
+            if (teacher.IsPointInVisionCone(player.Position))
+            {
+                player.playerSpeed = 0;
+            } 
+            else
+            {
+                player.playerSpeed = 5;
+            }
 
-            //bool collisionOccurred = CollisionManager.HandlePlayerCollision(player, desks, nerd, deskRows, deskCols);
+            if (CollisionManager.isCollidingRects(player.playerRect, nerd.NerdCopyZone)) 
+            {
+                cheatBar.cheatBarCanFill = true;
+            }
 
-            //// Handle Player-Desk collision
-            //if (!(collisionOccurred))
-            //{
-            //    player.Position = new Point(player.Position.X + (int)player.nextDX, player.Position.Y + (int)player.nextDY);
-            //}
-
-            //// Handle collision with nerd's copy zone
-            //if (CollisionManager.CheckCollision(player.playerRect, nerd.NerdCopyZone))
-            //{
-            //    cheatBar.cheatBarCanFill = true;
-            //}
+            // Death trigger check
+            if (CollisionManager.isCollidingRects(player.playerRect, teacher.teacherRect))
+            {
+                // So legit if you touch the teacher you're dead, no collision reaction necessary since you die upon touching them lol
+                System.Diagnostics.Debug.WriteLine($"You're dead!");
+            }
 
             MouseState mouseState = Mouse.GetState();
             cheatBar.Update(mouseState);
@@ -121,6 +138,7 @@ namespace StickClassroom
             spriteBatch.Begin();
             player.Draw(spriteBatch);
             nerd.Draw(spriteBatch);
+            teacher.Draw(spriteBatch);
 
             // Draw desks
             for (int i = 0; i < deskRows; i++)

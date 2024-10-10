@@ -5,16 +5,33 @@ namespace StickClassroom
 {
     internal class CollisionManager
     {
+        private Rectangle[] collidables;
 
-        // One function where I pass in the playerRect
-        /*
-         * This class should have access to all the gameObjects via it's Constructor (except for player of course)
-         * - really the construct should just be the rectangles from the class (so deskRect, nerdRect), not the whole object
-         * 
-         * The ultimate method will then use what was passed in the constructor and the passed in playerRect to determine if a 
-         * collision occurs.
-         * 
-         */
+        public CollisionManager(Rectangle[] collidables) 
+        {
+            this.collidables = collidables;
+        }
+
+        public bool isCollidingRects(Rectangle playerRect, Rectangle copyZone) 
+        {
+            if (playerRect.Intersects(copyZone)) 
+            {
+                return true;    
+            }
+            return false;
+        }
+
+        public Rectangle GetCollidingRectangle(Rectangle playerRect)
+        {
+            for (int i = 0; i < collidables.Length; i++)
+            {
+                if (collidables[i].Intersects(playerRect))
+                {
+                    return collidables[i];
+                }
+            }
+            return Rectangle.Empty;
+        }
     }
 }
 
