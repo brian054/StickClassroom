@@ -13,6 +13,8 @@ namespace StickClassroom
 
         CollisionManager CollisionManager;
 
+        DeskLayout DeskLayout;
+
         Texture2D rectTexture; // private or nah, yee prolly
         Desk[,] desks;
         int deskRows;
@@ -54,25 +56,27 @@ namespace StickClassroom
             cheatBar = new(rectTexture);
 
             collidables.Add(nerd.NerdRect);
-           // collidables.Add(teacher.teacherRect); collidables only for non-moving objects for now
+            // collidables.Add(teacher.teacherRect); collidables only for non-moving objects for now
 
+            DeskLayout = new DeskLayout(rectTexture, collidables, "High School");
+            //desks = DeskLayout.desks;
 
-            desks = new Desk[deskRows, deskCols];
-            for (int i = 0; i < deskRows; i++)
-            {
-                for (int j = 0; j < deskCols; j++)
-                {
-                    // Calculate desk positions
-                    int x = i * 158 + 80;
-                    int y = j * 120 + 170;
+            //desks = new Desk[deskRows, deskCols];
+            //for (int i = 0; i < deskRows; i++)
+            //{
+            //    for (int j = 0; j < deskCols; j++)
+            //    {
+            //        // Calculate desk positions
+            //        int x = i * 158 + 80;
+            //        int y = j * 120 + 170;
 
-                    // Create and place a new desk at the calculated position
-                    desks[i, j] = new Desk(x, y, rectTexture);
+            //        // Create and place a new desk at the calculated position
+            //        desks[i, j] = new Desk(x, y, rectTexture);
 
-                    // Store in collidables List
-                    collidables.Add(desks[i, j].DeskRect);
-                }
-            }
+            //        // Store in collidables List
+            //        collidables.Add(desks[i, j].DeskRect);
+            //    }
+            //}
 
             CollisionManager = new(collidables.ToArray());
 
@@ -141,13 +145,7 @@ namespace StickClassroom
             teacher.Draw(spriteBatch);
 
             // Draw desks
-            for (int i = 0; i < deskRows; i++)
-            {
-                for (int j = 0; j < deskCols; j++)
-                {
-                    desks[i, j].Draw(spriteBatch);
-                }
-            }
+            DeskLayout.Draw(spriteBatch);
 
             cheatBar.Draw(spriteBatch);
             spriteBatch.End();
