@@ -22,6 +22,8 @@ namespace StickClassroom
         private readonly int fillX;
         private int fillY;
 
+        private bool levelComplete = false;
+
         public CheatBar(Texture2D texture)
         {
             this.emptyTexture = texture;
@@ -45,6 +47,7 @@ namespace StickClassroom
                 else // so, the cheatBar is full meaning, the player has won the level
                 {
                     // Level complete!
+                    levelComplete = true;
                 }
             }
 
@@ -53,9 +56,15 @@ namespace StickClassroom
             fillRect = new(fillX, fillY, fillWidth, fillHeight);
         }
 
-        public void Draw(SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch, SpriteFont font)
         {
             spriteBatch.Draw(emptyTexture, outlineRect, Color.Red);
+
+            if (levelComplete)
+            {
+                spriteBatch.DrawString(font, "Level Complete!", new Vector2(100, 100), Color.White);
+            }
+
             spriteBatch.Draw(emptyTexture, fillRect, Color.Green);
         }
     }

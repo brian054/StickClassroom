@@ -70,7 +70,7 @@ namespace StickClassroom
                 for (int j = 0; j < DeskCols; j++)
                 {
                     // Calculate desk positions
-                    int x = i * 158 + 80;
+                    int x = i * 180 + 80; // 158
                     int y = j * 120 + 170;
 
                     // Create and place a new desk at the calculated position

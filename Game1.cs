@@ -26,6 +26,8 @@ namespace StickClassroom
         Teacher teacher;
         KeyboardState currentKeyboardState;
 
+        SpriteFont font;
+
         List<Rectangle> collidables = new List<Rectangle>();
 
         public Game1()
@@ -73,6 +75,7 @@ namespace StickClassroom
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
+            font = Content.Load<SpriteFont>("Test");
         }
 
         protected override void Update(GameTime gameTime)
@@ -129,7 +132,7 @@ namespace StickClassroom
             // Draw desks
             DeskLayout.Draw(spriteBatch);
 
-            cheatBar.Draw(spriteBatch);
+            cheatBar.Draw(spriteBatch, font);
             spriteBatch.End();
 
             base.Draw(gameTime);
