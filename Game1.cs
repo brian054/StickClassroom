@@ -4,6 +4,10 @@ using Microsoft.Xna.Framework.Input;
 using System;
 using System.Collections.Generic;
 
+/*
+ * CURRENT TASK: Teacher GridPath classes
+ */
+
 namespace StickClassroom
 {
     public class Game1 : Game // Essentially Game1 is your LevelManager class, obviously we'll fix this later, but for now this is assumed.
