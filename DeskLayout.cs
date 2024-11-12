@@ -5,26 +5,32 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.Xna.Framework;
-using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 
 /*
  * So what I'm thinking is you pass in the Level value to the constructor (enum)
  * then it builds the level based on that.
  * 
- * All the levels in a school type will be the same desk layout, the only difference is where
- * the nerd is.
- * 
- * 
+ * All the levels in a school type will be the same desk layout, the only differences are 
+ *  - default nerd position
+ *  
+ *  
+ *  Also, I'm thinking of puting the GridPoints layout in here too, so this would become more of a Level builder class 
+ *  so refactor later once you get grid points in here. Idk should we separate it out???? NOOOOO cuz you have to build the 
+ *  layout based on the desks positioning, so just build the teacher grid in here.
+ *  But then what about the teacher interacting with this environment???  
+ *
  */
 
 namespace StickClassroom
 {
     internal class DeskLayout
     {
-        public int DeskRows { get; set; }
-        public int DeskCols { get; set; }
-        public Desk[,] desks { get; set; }
+        private int DeskRows { get; set; }
+        private int DeskCols { get; set; }
+        private Desk[,] desks { get; set; }
+        private List<GridPoint> GridPoints { get; set; }
+
         private Texture2D DeskTexture;
 
         public DeskLayout(Texture2D deskTexture, List<Rectangle> collidables, string type) // enum to specify which layout to do, string for now
@@ -34,6 +40,7 @@ namespace StickClassroom
                 this.DeskRows = 4;
                 this.DeskCols = 6;
                 this.desks = new Desk[DeskRows, DeskCols];
+                this.GridPoints = new List<GridPoint>();
                 this.HighSchoolLayout(collidables); 
             } 
             //else if (type.Equals("Middle"))
@@ -61,6 +68,8 @@ namespace StickClassroom
                     desks[i, j].Draw(spriteBatch);
                 }
             }
+
+            GridPoints.ForEach(entity => entity.Draw(spriteBatch, DeskTexture, Color.Orange, 5));
         }
 
         private void HighSchoolLayout(List<Rectangle> collidables)
@@ -73,11 +82,29 @@ namespace StickClassroom
                     int x = i * 180 + 80; // 158
                     int y = j * 120 + 170;
 
-                    // Create and place a new desk at the calculated position
+                    // Create and set a new desk at the calculated position
                     desks[i, j] = new Desk(x, y, DeskTexture);
 
                     // Store in collidables List
-                    collidables.Add(desks[i, j].DeskRect); // WHY NULL WTF
+                    collidables.Add(desks[i, j].DeskRect); 
+
+                    // Calculate points around the desk for navigation
+                    int deskWidth = desks[i, j].DeskRect.Width;
+                    int deskHeight = desks[i, j].DeskRect.Height;
+
+                    // Create GridPoint instances around each desk
+                    // Adjust wait time and action as needed for each point
+
+                    // Point in front of the desk (aisle space)
+                    GridPoints.Add(new GridPoint(new Vector2(x - deskWidth / 2, y), 1.0f, "move"));
+
+                    // Point behind the desk
+                    GridPoints.Add(new GridPoint(new Vector2(x + deskWidth + deskWidth / 2, y), 1.0f, "move"));
+
+                    // Points to the left and right of the desk (between aisles)
+                    GridPoints.Add(new GridPoint(new Vector2(x, y - deskHeight / 2), 0.5f, "turn"));
+                    GridPoints.Add(new GridPoint(new Vector2(x, y + deskHeight + deskHeight / 2), 0.5f, "turn"));
+
                 }
             }
         }

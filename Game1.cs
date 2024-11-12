@@ -6,6 +6,8 @@ using System.Collections.Generic;
 
 /*
  * CURRENT TASK: Teacher GridPath classes
+ * 
+ * Next Task: Rename DeskLayout to like LevelBuilder it's just becoming one big level builder
  */
 
 namespace StickClassroom
@@ -32,7 +34,7 @@ namespace StickClassroom
 
         SpriteFont font;
 
-        List<Rectangle> collidables = new List<Rectangle>();
+        List<Rectangle> collidables = new List<Rectangle>(); // pretty sure we can move this out into DeskLayout 
 
         public Game1()
         {

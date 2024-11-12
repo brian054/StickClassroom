@@ -1,15 +1,26 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Graphics;
 
 /*
  * Defines a GridPoint, which is a point in the
  * teacher grid path that has certain properties.
  * These points will create a GridMatrix and
  * GridPaths can be created for each level
+ */
+
+/*
+ * Ummmmm okay so we create GridPoints in DeskLayout which is now more of a LevelBuilder,
+ * setting the positions via the desks.
+ * 
+ * I'm unsure of these GridPoints having action. Again stop thinking so much and just throw
+ * the fucking code at the screen this isn't 'contemplate for an hour and then do nothing' 
+ * this is 'try some shit, see what works and doesn't, repeat until finished lol'
+ * 
  */
 
 namespace StickClassroom
@@ -19,13 +30,22 @@ namespace StickClassroom
         private Vector2 Position { get; set; }
         private float WaitTime { get; set; }
 
-        private string Action { get; set; }    
+        private string Action { get; set; }
+
+
 
         public GridPoint(Vector2 position, float waitTime, string action)
         {
             Position = position;
             WaitTime = waitTime;
             Action = action;
+        }
+
+        public void Draw(SpriteBatch spriteBatch, Texture2D texture, Color color, int size = 5)
+        {
+            Rectangle pointRect = new((int)Position.X, (int)Position.Y, size, size);
+
+            spriteBatch.Draw(texture, pointRect, color);
         }
     }
 }
