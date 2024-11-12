@@ -1,0 +1,117 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Numerics;
+using System.Text;
+using System.Threading.Tasks;
+
+/*
+ * Defines a GridPoint, which is a point in the
+ * teacher grid path that has certain properties.
+ * These points will create a GridMatrix and
+ * GridPaths can be created for each level
+ */
+
+namespace StickClassroom
+{
+    internal class GridPoint
+    {
+        private Vector2 Position { get; set; }
+        private float WaitTime { get; set; }
+
+        private string Action { get; set; }    
+
+        public GridPoint(Vector2 position, float waitTime, string action)
+        {
+            Position = position;
+            WaitTime = waitTime;
+            Action = action;
+        }
+    }
+}
+
+
+// From ChatGPT, modify for yo self
+/*
+public class LevelGrid
+{
+    public List<GridPoint> ElementaryGrid { get; private set; }
+    public List<GridPoint> MiddleSchoolGrid { get; private set; }
+    public List<GridPoint> HighSchoolGrid { get; private set; }
+
+    public LevelGrid()
+    {
+        // Define positions for each grid type
+        ElementaryGrid = new List<GridPoint>
+        {
+            new GridPoint(new Vector2(100, 100), 1.0f, "LookAround"),
+            new GridPoint(new Vector2(150, 100), 2.0f, "CheckStudent"),
+            // Add more points as needed
+        };
+
+        MiddleSchoolGrid = new List<GridPoint>
+        {
+            new GridPoint(new Vector2(200, 200), 1.5f, "LookAround"),
+            new GridPoint(new Vector2(250, 200), 1.0f, "CheckStudent"),
+            // Add more points as needed
+        };
+
+        HighSchoolGrid = new List<GridPoint>
+        {
+            new GridPoint(new Vector2(300, 300), 2.0f, "LookAround"),
+            new GridPoint(new Vector2(350, 300), 1.5f, "CheckStudent"),
+            // Add more points as needed
+        };
+    }
+
+    public List<GridPoint> GetGridForLevelType(string levelType)
+    {
+        return levelType switch
+        {
+            "Elementary" => ElementaryGrid,
+            "MiddleSchool" => MiddleSchoolGrid,
+            "HighSchool" => HighSchoolGrid,
+            _ => throw new ArgumentException("Invalid level type")
+        };
+    }
+}
+
+public class TeacherPath
+{
+    public List<GridPoint> Points { get; set; }
+    public int CurrentPointIndex { get; private set; }
+    private float elapsedTime;
+
+    public TeacherPath(List<GridPoint> points)
+    {
+        Points = points;
+        CurrentPointIndex = 0;
+        elapsedTime = 0;
+    }
+
+    public GridPoint GetCurrentPoint()
+    {
+        return Points[CurrentPointIndex];
+    }
+
+    public void UpdatePath(float deltaTime)
+    {
+        elapsedTime += deltaTime;
+
+        if (elapsedTime >= GetCurrentPoint().WaitTime)
+        {
+            NextPoint();
+            elapsedTime = 0;
+        }
+    }
+
+    private void NextPoint()
+    {
+        CurrentPointIndex = (CurrentPointIndex + 1) % Points.Count; // Loop back to start if needed
+    }
+}
+
+
+
+
+*/
