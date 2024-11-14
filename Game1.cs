@@ -132,7 +132,7 @@ namespace StickClassroom
 
             spriteBatch.Begin();
             player.Draw(spriteBatch);
-            nerd.Draw(spriteBatch);
+            //nerd.Draw(spriteBatch);
             teacher.Draw(spriteBatch);
 
             // Draw desks

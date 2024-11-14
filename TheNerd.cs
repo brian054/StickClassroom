@@ -12,17 +12,17 @@ namespace StickClassroom
 
         public TheNerd(int x, int y, Texture2D texture) 
         {
-            NerdRect = new Rectangle(x, y, size, size);
+            //NerdRect = new Rectangle(x, y, size, size);
 
-            // Copy Zone
-            int padding = 15;
-            NerdCopyZone = new Rectangle(
-                x - padding,
-                y - padding,
-                size + 2 * padding,
-                size + 2 * padding);
+            //// Copy Zone
+            //int padding = 15;
+            //NerdCopyZone = new Rectangle(
+            //    x - padding,
+            //    y - padding,
+            //    size + 2 * padding,
+            //    size + 2 * padding);
 
-            this.texture = texture;
+            //this.texture = texture;
         }
 
         public void Draw(SpriteBatch spriteBatch)

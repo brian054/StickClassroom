@@ -96,14 +96,14 @@ namespace StickClassroom
                     // Adjust wait time and action as needed for each point
 
                     // Point in front of the desk (aisle space)
-                    GridPoints.Add(new GridPoint(new Vector2(x - deskWidth / 2, y), 1.0f, "move"));
+                    //GridPoints.Add(new GridPoint(new Vector2(x - (deskWidth / 2) - 15, y + (deskHeight / 2)), 1.0f, "move"));
 
                     // Point behind the desk
                     GridPoints.Add(new GridPoint(new Vector2(x + deskWidth + deskWidth / 2, y), 1.0f, "move"));
 
                     // Points to the left and right of the desk (between aisles)
-                    GridPoints.Add(new GridPoint(new Vector2(x, y - deskHeight / 2), 0.5f, "turn"));
-                    GridPoints.Add(new GridPoint(new Vector2(x, y + deskHeight + deskHeight / 2), 0.5f, "turn"));
+                    //GridPoints.Add(new GridPoint(new Vector2(x, y - deskHeight / 2), 0.5f, "turn"));
+                    //GridPoints.Add(new GridPoint(new Vector2(x, y + deskHeight + deskHeight / 2), 0.5f, "turn"));
 
                 }
             }
