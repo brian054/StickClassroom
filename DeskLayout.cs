@@ -36,13 +36,14 @@ namespace StickClassroom
         public DeskLayout(Texture2D deskTexture, List<Rectangle> collidables, string type) // enum to specify which layout to do, string for now
         {
             this.DeskTexture = deskTexture;
-            if (type.Equals("High")) {
+            if (type.Equals("High"))
+            {
                 this.DeskRows = 4;
                 this.DeskCols = 6;
                 this.desks = new Desk[DeskRows, DeskCols];
                 this.GridPoints = new List<GridPoint>();
-                this.HighSchoolLayout(collidables); 
-            } 
+                this.HighSchoolLayout(collidables);
+            }
             //else if (type.Equals("Middle"))
             //{
             //    this.DeskRows = 4;
@@ -86,22 +87,34 @@ namespace StickClassroom
                     desks[i, j] = new Desk(x, y, DeskTexture);
 
                     // Store in collidables List
-                    collidables.Add(desks[i, j].DeskRect); 
+                    collidables.Add(desks[i, j].DeskRect);
 
                     // Calculate points around the desk for navigation
                     int deskWidth = desks[i, j].DeskRect.Width;
                     int deskHeight = desks[i, j].DeskRect.Height;
 
                     // Create GridPoint instances around each desk
-                    // Right 
-                    GridPoints.Add(new GridPoint(new Vector2(x + deskWidth + 5 + deskWidth / 2, y + deskHeight / 2), 1.0f, "move"));
-                    // Left
-                    if (i == 0) {
+                    if (i == 0)
+                    {
+                        // Column 0, so that whole left side
+                        GridPoints.Add(new GridPoint(new Vector2(x - deskWidth / 2, y - deskHeight - 10), 1.0f, "move")); // to cover the top left, might not be needed
+
                         GridPoints.Add(new GridPoint(new Vector2(x - deskWidth / 2, y + deskHeight / 2), 1.0f, "move"));
+                        GridPoints.Add(new GridPoint(new Vector2(x - deskWidth / 2, y + deskHeight + deskHeight + 10), 1.0f, "move"));
                     }
-                    // Front
-                    if (j == 0) {
+                    else
+                    {
+                        // Bottom right, or bottom left. In the middle of the aisles.
+                        GridPoints.Add(new GridPoint(new Vector2(x - deskWidth / 2 - 15, y + (deskHeight / 2)), 1.0f, "move"));
+
+                        // Mid right
+                        GridPoints.Add(new GridPoint(new Vector2(x - deskWidth / 2 - 15, y + deskHeight + deskHeight + 10), 1.0f, "move"));
+                    }
+                    if (j == 0)
+                    {
+                        // Row 0, so in front of the first row of desks
                         GridPoints.Add(new GridPoint(new Vector2(x + deskWidth / 2, y - deskHeight - 10), 0.5f, "turn"));
+                        GridPoints.Add(new GridPoint(new Vector2(x + deskWidth + (deskWidth / 2), y - deskHeight - 10), 0.5f, "turn"));
                     }
                     // Behind
                     GridPoints.Add(new GridPoint(new Vector2(x + deskWidth / 2, y + deskHeight + deskHeight + 10), 0.5f, "turn"));
