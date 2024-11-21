@@ -93,17 +93,18 @@ namespace StickClassroom
                     int deskHeight = desks[i, j].DeskRect.Height;
 
                     // Create GridPoint instances around each desk
-                    // Adjust wait time and action as needed for each point
-
-                    // Point in front of the desk (aisle space)
-                    //GridPoints.Add(new GridPoint(new Vector2(x - (deskWidth / 2) - 15, y + (deskHeight / 2)), 1.0f, "move"));
-
-                    // Point behind the desk
-                    GridPoints.Add(new GridPoint(new Vector2(x + deskWidth + deskWidth / 2, y), 1.0f, "move"));
-
-                    // Points to the left and right of the desk (between aisles)
-                    //GridPoints.Add(new GridPoint(new Vector2(x, y - deskHeight / 2), 0.5f, "turn"));
-                    //GridPoints.Add(new GridPoint(new Vector2(x, y + deskHeight + deskHeight / 2), 0.5f, "turn"));
+                    // Right 
+                    GridPoints.Add(new GridPoint(new Vector2(x + deskWidth + 5 + deskWidth / 2, y + deskHeight / 2), 1.0f, "move"));
+                    // Left
+                    if (i == 0) {
+                        GridPoints.Add(new GridPoint(new Vector2(x - deskWidth / 2, y + deskHeight / 2), 1.0f, "move"));
+                    }
+                    // Front
+                    if (j == 0) {
+                        GridPoints.Add(new GridPoint(new Vector2(x + deskWidth / 2, y - deskHeight - 10), 0.5f, "turn"));
+                    }
+                    // Behind
+                    GridPoints.Add(new GridPoint(new Vector2(x + deskWidth / 2, y + deskHeight + deskHeight + 10), 0.5f, "turn"));
 
                 }
             }
