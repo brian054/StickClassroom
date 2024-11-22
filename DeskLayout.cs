@@ -8,18 +8,8 @@ using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Input;
 
 /*
- * So what I'm thinking is you pass in the Level value to the constructor (enum)
- * then it builds the level based on that.
- * 
- * All the levels in a school type will be the same desk layout, the only differences are 
- *  - default nerd position
- *  
- *  
- *  Also, I'm thinking of puting the GridPoints layout in here too, so this would become more of a Level builder class 
- *  so refactor later once you get grid points in here. Idk should we separate it out???? NOOOOO cuz you have to build the 
- *  layout based on the desks positioning, so just build the teacher grid in here.
- *  But then what about the teacher interacting with this environment???  
- *
+ * How to get better: write more code lol
+ * What is it Mark Zuckerberg said "Build fast, break fast, fail fast"
  */
 
 namespace StickClassroom
@@ -29,7 +19,8 @@ namespace StickClassroom
         private int DeskRows { get; set; }
         private int DeskCols { get; set; }
         private Desk[,] desks { get; set; }
-        private List<GridPoint> GridPoints { get; set; }
+        private List<GridPoint> GridPoints { get; set; } // maybe turn this into a Dictionary, yup the key is the PosString and the GridPoint obj is the value
+        //private Dictionary<string, GridPoint> GridPointDictionary { get; set; }
 
         private Texture2D DeskTexture;
 
@@ -41,6 +32,7 @@ namespace StickClassroom
                 this.DeskRows = 4;
                 this.DeskCols = 6;
                 this.desks = new Desk[DeskRows, DeskCols];
+                //this.GridPointDictionary = new Dictionary<string, GridPoint>();
                 this.GridPoints = new List<GridPoint>();
                 this.HighSchoolLayout(collidables);
             }
@@ -70,7 +62,7 @@ namespace StickClassroom
                 }
             }
 
-            GridPoints.ForEach(entity => entity.Draw(spriteBatch, DeskTexture, Color.Orange, 5));
+            GridPoints.ForEach(entity => entity.Draw(spriteBatch, DeskTexture, Color.Orange, 5)); hmmm
         }
 
         private void HighSchoolLayout(List<Rectangle> collidables)
@@ -79,6 +71,9 @@ namespace StickClassroom
             {
                 for (int j = 0; j < DeskCols; j++)
                 {
+                    // --------------
+                    // Desk Creation
+                    // --------------
                     // Calculate desk positions
                     int x = i * 180 + 80; // 158
                     int y = j * 120 + 170;
@@ -93,32 +88,32 @@ namespace StickClassroom
                     int deskWidth = desks[i, j].DeskRect.Width;
                     int deskHeight = desks[i, j].DeskRect.Height;
 
+                    // --------------
+                    // Grid Creation
+                    // --------------
                     // Create GridPoint instances around each desk
                     if (i == 0)
                     {
                         // Column 0, so that whole left side
-                        GridPoints.Add(new GridPoint(new Vector2(x - deskWidth / 2, y - deskHeight - 10), 1.0f, "move")); // to cover the top left, might not be needed
-
-                        GridPoints.Add(new GridPoint(new Vector2(x - deskWidth / 2, y + deskHeight / 2), 1.0f, "move"));
-                        GridPoints.Add(new GridPoint(new Vector2(x - deskWidth / 2, y + deskHeight + deskHeight + 10), 1.0f, "move"));
+                        GridPoints.Add(new GridPoint(new Vector2(x - deskWidth / 2, y + deskHeight / 2), 1.0f, "move", "00"));
+                        GridPoints.Add(new GridPoint(new Vector2(x - deskWidth / 2, y + deskHeight + deskHeight + 10), 1.0f, "move", "00"));
                     }
                     else
                     {
                         // Bottom right, or bottom left. In the middle of the aisles.
-                        GridPoints.Add(new GridPoint(new Vector2(x - deskWidth / 2 - 15, y + (deskHeight / 2)), 1.0f, "move"));
+                        GridPoints.Add(new GridPoint(new Vector2(x - deskWidth / 2 - 15, y + (deskHeight / 2)), 1.0f, "move", "00"));
 
                         // Mid right
-                        GridPoints.Add(new GridPoint(new Vector2(x - deskWidth / 2 - 15, y + deskHeight + deskHeight + 10), 1.0f, "move"));
+                        GridPoints.Add(new GridPoint(new Vector2(x - deskWidth / 2 - 15, y + deskHeight + deskHeight + 10), 1.0f, "move", "00"));
                     }
                     if (j == 0)
                     {
                         // Row 0, so in front of the first row of desks
-                        GridPoints.Add(new GridPoint(new Vector2(x + deskWidth / 2, y - deskHeight - 10), 0.5f, "turn"));
-                        GridPoints.Add(new GridPoint(new Vector2(x + deskWidth + (deskWidth / 2), y - deskHeight - 10), 0.5f, "turn"));
+                        GridPoints.Add(new GridPoint(new Vector2(x + deskWidth / 2, y - deskHeight - 10), 0.5f, "turn", "00"));
+                        GridPoints.Add(new GridPoint(new Vector2(x + deskWidth + (deskWidth / 2), y - deskHeight - 10), 0.5f, "turn", "00"));
                     }
                     // Behind
-                    GridPoints.Add(new GridPoint(new Vector2(x + deskWidth / 2, y + deskHeight + deskHeight + 10), 0.5f, "turn"));
-
+                    GridPoints.Add(new GridPoint(new Vector2(x + deskWidth / 2, y + deskHeight + deskHeight + 10), 0.5f, "turn", "00"));
                 }
             }
         }

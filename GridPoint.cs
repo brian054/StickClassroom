@@ -32,13 +32,15 @@ namespace StickClassroom
 
         private string Action { get; set; }
 
+        private string PositionString { get; set; }  // a two char string that indicates the position of the gridPoint
 
 
-        public GridPoint(Vector2 position, float waitTime, string action)
+        public GridPoint(Vector2 position, float waitTime, string action, string posString)
         {
             Position = position;
             WaitTime = waitTime;
             Action = action;
+            PositionString = posString;
         }
 
         public void Draw(SpriteBatch spriteBatch, Texture2D texture, Color color, int size = 5)
